@@ -74,7 +74,17 @@ st.markdown("""
 [data-testid="stMetric"] {background:linear-gradient(145deg,#172a41 0%,#102238 100%); border:1px solid #29415c; border-top:2px solid #2bbec5; padding:15px 15px 13px; border-radius:15px; box-shadow:0 10px 24px #02081055; min-height:106px;}
 [data-testid="stMetricLabel"] {justify-content:center; color:#a9bdd3;}
 [data-testid="stMetricValue"] {justify-content:center; color:#f4f8ff; font-weight:750;}
+[data-testid="stMetricValue"] > div {font-size:clamp(1rem,1.4vw,1.45rem); white-space:nowrap;}
 [data-testid="stMetricDelta"] {justify-content:center;}
+[data-testid="stFileUploaderDropzone"] {background:#102238 !important; border:1px dashed #3b718c !important; border-radius:12px !important;}
+[data-testid="stFileUploaderDropzone"] * {color:#dce9f7 !important;}
+[data-testid="stFileUploaderDropzone"] button {background:#193954 !important; border:1px solid #35788c !important;}
+[data-baseweb="select"] > div {background:#102238 !important; border-color:#35516e !important; color:#e8f0fa !important;}
+[data-baseweb="select"] input {color:#e8f0fa !important;}
+[data-baseweb="tag"] {background:#126a78 !important; border:1px solid #28b7bb !important; color:#f3ffff !important;}
+[data-baseweb="tag"] span, [data-baseweb="tag"] svg {color:#f3ffff !important; fill:#f3ffff !important;}
+[data-baseweb="popover"] ul, [data-baseweb="popover"] li {background:#102238 !important; color:#e8f0fa !important;}
+[data-baseweb="popover"] li:hover {background:#1b3954 !important;}
 [data-testid="stPlotlyChart"] {background:#0e1b2b; border:1px solid #20344c; border-radius:15px; padding:8px; box-shadow:0 8px 22px #02081044;}
 [data-testid="stMarkdownContainer"] h2, [data-testid="stMarkdownContainer"] h3 {color:#d9e9fb; font-weight:700;}
 [data-testid="stExpander"] {background:#0e1b2b; border:1px solid #243a53; border-radius:12px;}
