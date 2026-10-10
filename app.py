@@ -59,16 +59,29 @@ def sample_data():
     })
 
 
+px.defaults.template = "plotly_dark"
+
 st.markdown("""
 <style>
-.block-container {padding-top: 1.35rem; padding-bottom: 2rem;}
-.hero {text-align:center; color:#398fc4; font-size:2.5rem; font-weight:800; margin:.1rem 0 1rem;}
-.metric {background:#fff; border:1px solid #e9eef3; border-radius:12px; padding:14px 16px; box-shadow:0 3px 12px #17324d12; text-align:center;}
-.metric-label {font-size:.84rem; color:#667085; margin-bottom:5px;}
-.metric-value {font-size:1.75rem; font-weight:750; color:#202a35;}
-[data-testid="stMetric"] {background:white; border:1px solid #e9eef3; padding:14px 16px; border-radius:12px; box-shadow:0 3px 12px #17324d12;}
-[data-testid="stMetricLabel"] {justify-content:center;}
-[data-testid="stMetricValue"] {justify-content:center;}
+:root { color-scheme: dark; }
+.stApp, [data-testid="stAppViewContainer"] {background:#07111f; color:#e8f0fa;}
+[data-testid="stMain"] {background:radial-gradient(ellipse at 50% -15%, #16375a 0%, #0b192a 42%, #07111f 78%);}
+[data-testid="stHeader"] {background:rgba(7,17,31,.82);}
+[data-testid="stSidebar"] {background:linear-gradient(180deg,#0d1c30 0%,#091523 100%); border-right:1px solid #20334b;}
+.block-container {padding-top:1.4rem; padding-bottom:2.2rem; max-width:1500px;}
+.hero {text-align:center; color:#f4f9ff; font-size:2.25rem; font-weight:800; letter-spacing:.02em; margin:.15rem 0 .7rem; padding:1.2rem; border:1px solid #2b5372; border-radius:18px; background:linear-gradient(105deg,#102842 0%,#143958 48%,#123246 100%); box-shadow:0 14px 38px #02081088;}
+[data-testid="stCaptionContainer"] {color:#9eb1c9;}
+[data-testid="stMetric"] {background:linear-gradient(145deg,#172a41 0%,#102238 100%); border:1px solid #29415c; border-top:2px solid #2bbec5; padding:15px 15px 13px; border-radius:15px; box-shadow:0 10px 24px #02081055; min-height:106px;}
+[data-testid="stMetricLabel"] {justify-content:center; color:#a9bdd3;}
+[data-testid="stMetricValue"] {justify-content:center; color:#f4f8ff; font-weight:750;}
+[data-testid="stMetricDelta"] {justify-content:center;}
+[data-testid="stPlotlyChart"] {background:#0e1b2b; border:1px solid #20344c; border-radius:15px; padding:8px; box-shadow:0 8px 22px #02081044;}
+[data-testid="stMarkdownContainer"] h2, [data-testid="stMarkdownContainer"] h3 {color:#d9e9fb; font-weight:700;}
+[data-testid="stExpander"] {background:#0e1b2b; border:1px solid #243a53; border-radius:12px;}
+[data-testid="stDataFrame"] {border:1px solid #243a53; border-radius:10px;}
+.stButton button, .stDownloadButton button {background:linear-gradient(100deg,#147d91,#1a9da6); color:white; border:1px solid #33c4c8; border-radius:9px;}
+.stButton button:hover, .stDownloadButton button:hover {background:#23aeb5; color:white; border-color:#65e4de;}
+hr {border-color:#243a53;}
 </style>
 """, unsafe_allow_html=True)
 
