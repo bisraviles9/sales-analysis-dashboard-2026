@@ -61,6 +61,17 @@ def sample_data():
 
 px.defaults.template = "plotly_dark"
 
+
+def dark_chart(fig):
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#0e1b2b",
+        plot_bgcolor="#0e1b2b",
+        font_color="#dce7f5",
+    )
+    return fig
+
+
 st.markdown("""
 <style>
 :root { color-scheme: dark; }
@@ -79,12 +90,10 @@ st.markdown("""
 [data-testid="stFileUploaderDropzone"] {background:#102238 !important; border:1px dashed #3b718c !important; border-radius:12px !important;}
 [data-testid="stFileUploaderDropzone"] * {color:#dce9f7 !important;}
 [data-testid="stFileUploaderDropzone"] button {background:#193954 !important; border:1px solid #35788c !important;}
-[data-baseweb="select"] > div {background:#102238 !important; border-color:#35516e !important; color:#e8f0fa !important;}
-[data-baseweb="select"] input {color:#e8f0fa !important;}
-[data-baseweb="tag"] {background:#126a78 !important; border:1px solid #28b7bb !important; color:#f3ffff !important;}
-[data-baseweb="tag"] span, [data-baseweb="tag"] svg {color:#f3ffff !important; fill:#f3ffff !important;}
-[data-baseweb="popover"] ul, [data-baseweb="popover"] li {background:#102238 !important; color:#e8f0fa !important;}
-[data-baseweb="popover"] li:hover {background:#1b3954 !important;}
+[data-testid="stSelectbox"] [data-baseweb="select"], [data-testid="stSelectbox"] [data-baseweb="select"] *, [data-testid="stMultiSelect"] [data-baseweb="select"], [data-testid="stMultiSelect"] [data-baseweb="select"] * {background-color:#102238 !important; color:#e8f0fa !important; border-color:#35516e !important;}
+[data-testid="stMultiSelect"] [data-baseweb="tag"], [data-testid="stMultiSelect"] [data-baseweb="tag"] * {background-color:#126a78 !important; border-color:#28b7bb !important; color:#f3ffff !important; fill:#f3ffff !important;}
+[data-baseweb="popover"], [data-baseweb="popover"] *, [role="listbox"], [role="option"] {background-color:#102238 !important; color:#e8f0fa !important;}
+[role="option"]:hover {background-color:#1b3954 !important;}
 [data-testid="stPlotlyChart"] {background:#0e1b2b; border:1px solid #20344c; border-radius:15px; padding:8px; box-shadow:0 8px 22px #02081044;}
 [data-testid="stMarkdownContainer"] h2, [data-testid="stMarkdownContainer"] h3 {color:#d9e9fb; font-weight:700;}
 [data-testid="stExpander"] {background:#0e1b2b; border:1px solid #243a53; border-radius:12px;}
@@ -172,20 +181,20 @@ with left:
     fig = px.pie(by_region, names="Region", values="Sales", hole=.05, color_discrete_sequence=PALETTE)
     fig.update_traces(textposition="outside", textinfo="label+percent")
     fig.update_layout(margin=dict(t=8, b=5, l=5, r=5), showlegend=False, height=300)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(dark_chart(fig), use_container_width=True)
 with mid:
     st.subheader("Ventas por categoría")
     by_category = filtered.groupby("Category", as_index=False)["Sales"].sum().sort_values("Sales", ascending=False)
     fig = px.bar(by_category, x="Category", y="Sales", color_discrete_sequence=[BLUE], text_auto=".2s")
     fig.update_layout(margin=dict(t=8, b=5, l=5, r=5), height=300, showlegend=False, xaxis_title="", yaxis_title="Ventas")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(dark_chart(fig), use_container_width=True)
 with right:
     st.subheader("Ventas por segmento")
     by_segment = filtered.groupby("Segment", as_index=False)["Sales"].sum()
     fig = px.pie(by_segment, names="Segment", values="Sales", hole=.62, color_discrete_sequence=[DARK_BLUE, BLUE, TEAL])
     fig.update_traces(textposition="outside", textinfo="label+percent")
     fig.update_layout(margin=dict(t=8, b=5, l=5, r=5), showlegend=False, height=300)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(dark_chart(fig), use_container_width=True)
 
 left, right = st.columns([1, 1.55])
 with left:
@@ -193,21 +202,21 @@ with left:
     by_sub = filtered.groupby("Sub-Category", as_index=False)["Sales"].sum().sort_values("Sales")
     fig = px.bar(by_sub, x="Sales", y="Sub-Category", orientation="h", color_discrete_sequence=[BLUE], text_auto=".2s")
     fig.update_layout(margin=dict(t=8, b=5, l=5, r=5), height=390, xaxis_title="Ventas", yaxis_title="")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(dark_chart(fig), use_container_width=True)
 with right:
     st.subheader("Tendencia mensual por región")
     monthly = filtered.groupby(["Month", "Region"], as_index=False)["Sales"].sum()
     monthly["Mes"] = monthly["Month"].map(month_names)
     fig = px.area(monthly, x="Mes", y="Sales", color="Region", category_orders={"Mes": [month_names[m] for m in range(1,13)]}, color_discrete_sequence=PALETTE)
     fig.update_layout(margin=dict(t=8, b=5, l=5, r=5), height=390, xaxis_title="Mes de 2026", yaxis_title="Ventas", legend_title="Región")
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(dark_chart(fig), use_container_width=True)
 
 st.subheader("Ventas por estado")
 if "State" in filtered and (filtered["State"] != "Not specified").any():
     by_state = filtered.groupby("State", as_index=False)["Sales"].sum().sort_values("Sales", ascending=False)
     fig = px.bar(by_state, x="State", y="Sales", color="Sales", color_continuous_scale=["#b9e7f5", DARK_BLUE], text_auto=".2s")
     fig.update_layout(margin=dict(t=5, b=5, l=5, r=5), height=330, xaxis_title="Estado", yaxis_title="Ventas", coloraxis_showscale=False)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(dark_chart(fig), use_container_width=True)
 else:
     st.info("El CSV no incluye nombres de estado para mostrar este gráfico.")
 
