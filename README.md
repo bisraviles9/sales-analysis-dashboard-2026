@@ -1,10 +1,10 @@
-# Sales Analysis Dashboard 2026
+# Panel de análisis de ventas · 2026
 
-Dashboard interactivo en Python y Streamlit, inspirado en la referencia visual enviada. Incluye filtros, indicadores y gráficos de ventas por región, categoría, segmento, subcategoría, estado y mes.
+Tablero interactivo creado en Python con Streamlit, inspirado en el dashboard de referencia. Toda la interfaz, los datos de demostración, los gráficos y la descarga están en español.
 
-> La aplicación inicia con datos ficticios reproducibles del año 2026. No representan ventas reales. Puedes cargar tu propio CSV desde la barra lateral.
+> La app comienza con 10.000 registros ficticios y reproducibles para 2026; no son ventas reales. Puedes cargar un archivo CSV propio desde los filtros.
 
-## Ejecutar localmente
+## Ejecutar la app
 
 ```bash
 python -m venv .venv
@@ -13,19 +13,21 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Formato del CSV
+## Columnas para cargar un CSV
 
-Columnas obligatorias: `Order Date`, `Region`, `Category`, `Segment`, `Sales`, `Quantity`, `Profit`, `Discount`.
+Obligatorias: `Fecha del pedido`, `Región`, `Categoría`, `Segmento`, `Ventas`, `Unidades`, `Ganancia` y `Descuento`.
 
-Columnas opcionales: `State`, `Sub-Category`, `Order ID`. Las fechas pueden ser cualquier fecha; el selector de año muestra los años presentes en el archivo.
+Opcionales: `Estado`, `Subcategoría` e `ID del pedido`. La aplicación también reconoce los encabezados equivalentes en inglés (`Order Date`, `Region`, `Category`, `Segment`, `Sales`, `Quantity`, `Profit`, `Discount`, `State`, `Sub-Category`, `Order ID`).
+
+La descarga de los registros filtrados usa encabezados en español y codificación compatible con Excel.
 
 ## Publicar en Streamlit Community Cloud
 
-1. Sube este proyecto a un repositorio de GitHub.
-2. En Streamlit Community Cloud, elige **Create app** y selecciona ese repositorio.
-3. Indica `app.py` como archivo principal y publica.
+1. Sube este proyecto a GitHub.
+2. En Streamlit Community Cloud, crea una app desde el repositorio.
+3. Elige `app.py` como archivo principal y publícala.
 
 ## Archivos
 
-- `app.py`: aplicación y datos de demostración.
+- `app.py`: aplicación, visualizaciones y datos ficticios.
 - `requirements.txt`: dependencias.

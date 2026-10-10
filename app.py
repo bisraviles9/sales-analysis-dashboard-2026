@@ -1,40 +1,68 @@
-import calendar
 from datetime import date
 
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-st.set_page_config(page_title="Sales Analysis Dashboard 2026", page_icon="📊", layout="wide")
+st.set_page_config(page_title="Panel de ventas 2026", page_icon="📊", layout="wide")
 
 BLUE = "#49a9e8"
 DARK_BLUE = "#1261a0"
 TEAL = "#28c4c7"
 PALETTE = [BLUE, DARK_BLUE, TEAL, "#80c8f3", "#245da8", "#87dedb"]
 
+SPANISH_COLUMN_NAMES = {
+    "Order Date": "Fecha del pedido", "Region": "Región", "State": "Estado",
+    "Category": "Categoría", "Sub-Category": "Subcategoría", "Segment": "Segmento",
+    "Sales": "Ventas", "Quantity": "Unidades", "Profit": "Ganancia",
+    "Discount": "Descuento", "Order ID": "ID del pedido",
+    "Year": "Año", "Month": "Mes",
+}
+
+
+def normalizar_columnas(df):
+    """Acepta encabezados de CSV en español o inglés y los normaliza internamente."""
+    import unicodedata
+
+    equivalencias = {}
+    for ingles, espanol in SPANISH_COLUMN_NAMES.items():
+        equivalencias[ingles.casefold()] = ingles
+        texto = unicodedata.normalize("NFD", espanol.casefold())
+        equivalencias["".join(c for c in texto if unicodedata.category(c) != "Mn")] = ingles
+    equivalencias["cantidad"] = "Quantity"
+    equivalencias["unidades"] = "Quantity"
+    equivalencias["fecha"] = "Order Date"
+    renombres = {}
+    for columna in df.columns:
+        texto = unicodedata.normalize("NFD", str(columna).strip().casefold().replace("_", " "))
+        clave = "".join(c for c in texto if unicodedata.category(c) != "Mn")
+        if clave in equivalencias:
+            renombres[columna] = equivalencias[clave]
+    return df.rename(columns=renombres)
+
 
 def sample_data():
-    """Reproducible demo dataset for 2026 (fictional—not real sales)."""
+    """Datos ficticios reproducibles para la demostración del año 2026."""
     import numpy as np
 
     rng = np.random.default_rng(2026)
     n = 10_000
-    regions = ["West", "East", "Central", "South"]
+    regions = ["Oeste", "Este", "Centro", "Sur"]
     states_by_region = {
-        "West": ["California", "Washington", "Oregon", "Nevada", "Arizona"],
-        "East": ["New York", "Pennsylvania", "Massachusetts", "Virginia", "Georgia"],
-        "Central": ["Illinois", "Ohio", "Michigan", "Missouri", "Colorado"],
-        "South": ["Texas", "Florida", "Tennessee", "North Carolina", "Alabama"],
+        "Oeste": ["California", "Washington", "Oregón", "Nevada", "Arizona"],
+        "Este": ["Nueva York", "Pensilvania", "Massachusetts", "Virginia", "Georgia"],
+        "Centro": ["Illinois", "Ohio", "Míchigan", "Misuri", "Colorado"],
+        "Sur": ["Texas", "Florida", "Tennessee", "Carolina del Norte", "Alabama"],
     }
     region = rng.choice(regions, n, p=[.31, .28, .22, .19])
     states = [rng.choice(states_by_region[r]) for r in region]
-    categories = rng.choice(["Technology", "Furniture", "Office Supplies"], n, p=[.36, .32, .32])
+    categories = rng.choice(["Tecnología", "Muebles", "Suministros de oficina"], n, p=[.36, .32, .32])
     subcategories = []
     for cat in categories:
         options = {
-            "Technology": ["Phones", "Accessories", "Copiers", "Machines"],
-            "Furniture": ["Chairs", "Tables", "Bookcases", "Furnishings"],
-            "Office Supplies": ["Binders", "Paper", "Storage", "Labels", "Art", "Envelopes"],
+            "Tecnología": ["Teléfonos", "Accesorios", "Fotocopiadoras", "Máquinas"],
+            "Muebles": ["Sillas", "Mesas", "Estanterías", "Mobiliario"],
+            "Suministros de oficina": ["Carpetas", "Papel", "Almacenamiento", "Etiquetas", "Arte", "Sobres"],
         }[cat]
         subcategories.append(rng.choice(options))
     # Use Python ordinals so generated dates always stay within calendar year 2026.
@@ -44,7 +72,7 @@ def sample_data():
     sales = unit_price * quantity
     discount = rng.choice([0, .05, .10, .15, .20], n, p=[.25, .25, .25, .15, .10])
     profit = sales * rng.uniform(.08, .34, n) - sales * discount * .25
-    segment = rng.choice(["Consumer", "Corporate", "Home Office"], n, p=[.51, .31, .18])
+    segment = rng.choice(["Consumidor final", "Empresas", "Oficina en casa"], n, p=[.51, .31, .18])
     return pd.DataFrame({
         "Order Date": dates,
         "Region": region,
@@ -104,20 +132,21 @@ hr {border-color:#243a53;}
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="hero">📊 Sales Analysis Dashboard · 2026</div>', unsafe_allow_html=True)
-st.caption("Panel interactivo de ventas · Datos demostrativos ficticios para 2026")
+st.markdown('<div class="hero">📊 Panel de análisis de ventas · 2026</div>', unsafe_allow_html=True)
+st.caption("Tablero interactivo · Datos de demostración ficticios para 2026")
 
 with st.sidebar:
     st.header("Filtros")
-    uploaded = st.file_uploader("Cargar tus datos (CSV)", type=["csv"], help="Columnas mínimas: Order Date, Region, Category, Segment, Sales, Quantity, Profit y Discount. State y Sub-Category son opcionales.")
+    uploaded = st.file_uploader("Cargar tus datos (CSV)", type=["csv"], help="Columnas obligatorias: Fecha del pedido, Región, Categoría, Segmento, Ventas, Unidades, Ganancia y Descuento. Estado, Subcategoría e ID del pedido son opcionales. También acepta encabezados en inglés.")
 
     if uploaded:
         try:
-            data = pd.read_csv(uploaded)
+            data = normalizar_columnas(pd.read_csv(uploaded))
             required = {"Order Date", "Region", "Category", "Segment", "Sales", "Quantity", "Profit", "Discount"}
             missing = required - set(data.columns)
             if missing:
-                st.error("Faltan columnas: " + ", ".join(sorted(missing)))
+                faltantes = [SPANISH_COLUMN_NAMES.get(col, col) for col in sorted(missing)]
+                st.error("Faltan estas columnas: " + ", ".join(faltantes))
                 data = sample_data()
             else:
                 data["Order Date"] = pd.to_datetime(data["Order Date"], errors="coerce")
@@ -125,9 +154,9 @@ with st.sidebar:
                     data[col] = pd.to_numeric(data[col], errors="coerce")
                 data = data.dropna(subset=["Order Date", "Sales", "Quantity", "Profit", "Discount"])
                 if "State" not in data:
-                    data["State"] = "Not specified"
+                    data["State"] = "Sin especificar"
                 if "Sub-Category" not in data:
-                    data["Sub-Category"] = "Not specified"
+                    data["Sub-Category"] = "Sin especificar"
         except Exception as exc:
             st.error(f"No se pudo leer el CSV: {exc}")
             data = sample_data()
@@ -144,7 +173,7 @@ with st.sidebar:
     selected_categories = st.multiselect("Categoría", category_options, default=category_options)
     segment_options = sorted(data["Segment"].dropna().unique().tolist())
     selected_segments = st.multiselect("Segmento", segment_options, default=segment_options)
-    month_names = {i: calendar.month_abbr[i] for i in range(1, 13)}
+    month_names = {1: "Ene", 2: "Feb", 3: "Mar", 4: "Abr", 5: "May", 6: "Jun", 7: "Jul", 8: "Ago", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dic"}
     data["Month"] = data["Order Date"].dt.month
     month_options = sorted(data["Month"].dropna().unique().astype(int).tolist())
     selected_months = st.multiselect("Mes", month_options, default=month_options, format_func=lambda m: month_names[m])
@@ -212,7 +241,7 @@ with right:
     st.plotly_chart(dark_chart(fig), use_container_width=True)
 
 st.subheader("Ventas por estado")
-if "State" in filtered and (filtered["State"] != "Not specified").any():
+if "State" in filtered and (filtered["State"] != "Sin especificar").any():
     by_state = filtered.groupby("State", as_index=False)["Sales"].sum().sort_values("Sales", ascending=False)
     fig = px.bar(by_state, x="State", y="Sales", color="Sales", color_continuous_scale=["#b9e7f5", DARK_BLUE], text_auto=".2s")
     fig.update_layout(margin=dict(t=5, b=5, l=5, r=5), height=330, xaxis_title="Estado", yaxis_title="Ventas", coloraxis_showscale=False)
@@ -221,7 +250,8 @@ else:
     st.info("El CSV no incluye nombres de estado para mostrar este gráfico.")
 
 with st.expander("Ver datos filtrados"):
-    st.dataframe(filtered.drop(columns=["Year", "Month"], errors="ignore"), use_container_width=True, hide_index=True)
-    st.download_button("Descargar datos filtrados (CSV)", filtered.to_csv(index=False).encode("utf-8"), file_name=f"ventas_{selected_year}_filtradas.csv", mime="text/csv")
+    datos_en_espanol = filtered.drop(columns=["Year", "Month"], errors="ignore").rename(columns=SPANISH_COLUMN_NAMES)
+    st.dataframe(datos_en_espanol, use_container_width=True, hide_index=True)
+    st.download_button("Descargar datos filtrados (CSV)", datos_en_espanol.to_csv(index=False).encode("utf-8-sig"), file_name=f"ventas_{selected_year}_filtradas.csv", mime="text/csv")
 
-st.caption("© Dashboard demostrativo · Puedes reemplazar la muestra cargando tu archivo CSV.")
+st.caption("© Panel demostrativo · Puedes cargar tus propios datos desde el menú de filtros.")
